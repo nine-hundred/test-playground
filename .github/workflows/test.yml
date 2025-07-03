@@ -49,11 +49,6 @@ jobs:
             sleep 2
           done
           
-          echo "Waiting for LocalStack..."
-          until curl -f http://localhost:4566/_localstack/health; do
-            sleep 2
-          done
-          
           echo "Waiting for Application..."
           until curl -f http://localhost:8080/health; do
             sleep 2
