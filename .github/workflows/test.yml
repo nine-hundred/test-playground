@@ -37,6 +37,13 @@ jobs:
           docker compose up -d
           sleep 30
 
+      - name: Debug config
+        run: |
+          echo "=== Config file content ==="
+          docker exec todo_app cat config.json
+          echo "=== Environment variables ==="
+          docker exec todo_app env | grep -i redis
+
       - name: Wait for services to be ready
         run: |
           echo "Waiting for MySQL..."

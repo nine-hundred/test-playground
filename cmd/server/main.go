@@ -27,7 +27,7 @@ func main() {
 
 	rdb, err := redisClient.NewRedisClient(cfg.Redis)
 	if err != nil {
-		log.Fatal("Failed to connect to Redis:", err)
+		log.Fatal("Failed to connect to Redis:", err, cfg.Redis.Host)
 	}
 
 	log.Println(cfg)
