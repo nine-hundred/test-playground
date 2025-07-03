@@ -34,8 +34,11 @@ jobs:
 
       - name: Start services
         run: |
-          docker compose up -d
+          docker compose up -d mysql redis
           sleep 30
+          
+          docker compose up -d app
+          sleep 10
 
       - name: Debug container status
         run: |
