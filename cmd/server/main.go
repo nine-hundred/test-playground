@@ -30,6 +30,8 @@ func main() {
 		log.Fatal("Failed to connect to Redis:", err)
 	}
 
+	log.Println(cfg)
+
 	r := gin.Default()
 
 	r.Use(gin.Logger())

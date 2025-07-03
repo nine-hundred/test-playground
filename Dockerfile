@@ -15,8 +15,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main ./cmd/server
 
 # config.json 생성 (Build stage에서) - 디버깅 추가
-RUN echo '{"server":{"port":8080},"database":{"host":"mysql","port":3306,"user":"todouser","password":"password","name":"todoapp"}}' > config.json
-
+RUN echo '{"server":{"port":8080},"database":{"host":"mysql","port":3306,"user":"todouser","password":"password","name":"todoapp"}, "redis": {"Host": "localhost","Port": 6379,"Password": "","DB": 0}}' > config.json
 # Runtime stage
 FROM alpine:latest
 
