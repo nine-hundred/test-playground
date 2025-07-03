@@ -1,0 +1,84 @@
+name: Integration Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.24'
+
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Install dependencies
+        run: go mod download
+
+      - name: Start services
+        run: |
+          docker-compose up -d
+          sleep 30
+
+      - name: Wait for services to be ready
+        run: |
+          echo "Waiting for MySQL..."
+          until docker exec todo_mysql mysqladmin ping -h"localhost" --silent; do
+            sleep 2
+          done
+          
+          echo "Waiting for Redis..."
+          until docker exec todo_redis redis-cli ping; do
+            sleep 2
+          done
+          
+          echo "Waiting for LocalStack..."
+          until curl -f http://localhost:4566/_localstack/health; do
+            sleep 2
+          done
+          
+          echo "Waiting for Application..."
+          until curl -f http://localhost:8080/health; do
+            sleep 2
+          done
+          
+          echo "All services are ready!"
+
+      - name: Run tests
+        run: |
+          go test ./test/integration/... -v -race -timeout=300s
+
+      - name: Collect logs on failure
+        if: failure()
+        run: |
+          echo "=== Application Logs ==="
+          docker logs todo_app || true
+          echo "=== MySQL Logs ==="
+          docker logs todo_mysql || true
+          echo "=== Redis Logs ==="
+          docker logs todo_redis || true
+          echo "=== LocalStack Logs ==="
+          docker logs todo_localstack || true
+
+      - name: Cleanup
+        if: always()
+        run: |
+          docker-compose down -v
+          docker system prune -f
