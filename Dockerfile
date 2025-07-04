@@ -27,7 +27,7 @@ WORKDIR /root/
 
 # 빌드된 바이너리 복사
 COPY --from=builder /app/main .
-RUN echo '{"server":{"port":8080},"database":{"host":"mysql","port":3306,"user":"todouser","password":"password","name":"todoapp"}, "redis": {"Host": "localhost","Port": 6379,"Password": "","DB": 0}}' > config.json
+RUN echo '{"server":{"port":8080},"database":{"host":"mysql","port":3306,"user":"todouser","password":"password","name":"todoapp"}, "redis": {"host": "redis","port": 6379,"password": "","db": 0}}' > config.json
 # 포트 노출
 EXPOSE 8080
 
