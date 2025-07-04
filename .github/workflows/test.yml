@@ -32,23 +32,6 @@ jobs:
       - name: Install dependencies
         run: go mod download
 
-      - name: Start services
-        run: |
-          docker compose up -d mysql redis
-          sleep 30
-          
-          docker compose up -d app
-          sleep 10
-
-      - name: Debug container status
-        run: |
-          echo "=== All containers ==="
-          docker compose ps
-          echo "=== Failed container logs ==="
-          docker logs todo_app
-          echo "=== Docker compose logs ==="
-          docker compose logs app
-
       - name: Wait for services to be ready
         run: |
           echo "Waiting for MySQL..."
