@@ -32,33 +32,6 @@ jobs:
       - name: Install dependencies
         run: go mod download
 
-#      - name: Wait for services to be ready
-#        run: |
-#          echo "Waiting for MySQL..."
-#          until docker exec todo_mysql mysqladmin ping -h"localhost" --silent; do
-#            sleep 2
-#          done
-#
-#          echo "Waiting for Redis..."
-#          until docker exec todo_redis redis-cli ping; do
-#            sleep 2
-#          done
-#
-#          echo "Waiting for Application..."
-#          attempts=0
-#          until curl -f http://localhost:8080/health; do
-#            echo "Attempt $((++attempts)): Application not ready yet"
-#            if [ $attempts -eq 1 ] || [ $((attempts % 5)) -eq 0 ]; then
-#              echo "=== Container Status ==="
-#              docker compose ps
-#              echo "=== Application Logs ==="
-#              docker logs todo_app | tail -20
-#            fi
-#            sleep 10
-#          done
-#
-#          echo "All services are ready!"
-
       - name: Run tests
         run: |
           go test ./test/integration/... -v -race -timeout=300s
