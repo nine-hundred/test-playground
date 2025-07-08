@@ -20,6 +20,44 @@ Mock 대신 실제 의존성(TestContainers, LocalStack..)을 사용하는 통�
 ### 개발 주기 통합
 테스트는 개발 주기에 자연스럽게 통합되어야 합니다. 이를 위해 GitHub-Actions에 테스트를 포함시켜 모든 Pull Request에서 자동으로 실행되도록 구성했습니다.
 
+### 테스트 구현 예시
+```go
+func TestTodoIntegration(t *testing.T) {
+    // Docker Compose로 실제 환경 구성
+    composeStack, err := compose.NewDockerCompose("../../docker-compose.yml")
+    err = composeStack.Up(ctx, compose.Wait(true))
+    
+    // 실제 데이터베이스 연결 (Repository 검증용)
+    db, err := database.Connect(getTestDatabaseConfig())
+    repo := repository.NewTodoRepository(db)
+
+    // AAA패턴으로 API 테스트 + Repository 검증
+    t.Run("Create Todo", func (t *testing.T) {
+        // Arrange: 테스트 데이터 준비
+        todoReq := map[string]interface{}{
+            "title":       "dummy title",
+            "description": "desc",
+        }
+        reqBody, err := json.Marshal(todoReq)
+        assert.NoError(t, err)
+        
+		// Act: 실제 동작 수행
+        resp, err := http.Post(baseURL+"/api/v1/todos",
+        "application/json", bytes.NewBuffer(reqBody))
+        
+        // Assert: HTTP 응답 검증
+        assert.Equal(t, http.StatusCreated, resp.StatusCode)
+        
+        // Assert: Repository로 실제 저장 확인
+        todoModel, err := repo.GetTodo(int(todoResp.Todo.ID))
+        assert.NoError(t, err)
+        assert.Equal(t, "dummy title", todoModel.Title)
+    })
+....
+}
+
+```
+
 ## 기술 스택
 ### Backend
 - Go + Gin - 간단한 HTTP API 구성

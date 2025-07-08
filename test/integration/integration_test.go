@@ -48,7 +48,7 @@ func TestTodoIntegration(t *testing.T) {
 	t.Run("Create Todo", func(t *testing.T) {
 		// Arrange
 		todoReq := map[string]interface{}{
-			"title":       "title",
+			"title":       "dummy title",
 			"description": "desc",
 		}
 		reqBody, err := json.Marshal(todoReq)
@@ -60,9 +60,21 @@ func TestTodoIntegration(t *testing.T) {
 
 		// Assert
 		assert.Equal(t, resp.StatusCode, http.StatusOK)
-		var respBody map[string]interface{}
-		err = json.NewDecoder(resp.Body).Decode(&respBody)
-		assert.Equal(t, "Todo created successfully", respBody["message"])
+
+		body, err := io.ReadAll(resp.Body)
+		assert.NoError(t, err)
+		type CreateResponse struct {
+			Message string     `json:"message"`
+			Todo    model.Todo `json:"todo"`
+		}
+		var todoResp CreateResponse
+		err = json.Unmarshal(body, &todoResp)
+		assert.NoError(t, err)
+
+		assert.Equal(t, todoResp.Message, "Todo created successfully")
+		todoModel, err := repo.GetTodo(int(todoResp.Todo.ID))
+		assert.NoError(t, err)
+		assert.Equal(t, todoModel.Title, "dummy title")
 	})
 
 	t.Run("Get All Todos", func(t *testing.T) {
