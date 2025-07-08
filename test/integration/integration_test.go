@@ -31,7 +31,10 @@ func TestTodoIntegration(t *testing.T) {
 
 	defer func() {
 		err := composeStack.Down(ctx, compose.RemoveOrphans(true), compose.RemoveImagesLocal)
-		require.NoError(t, err, "Failed to cleanup docker-compose stack")
+		if err != nil {
+			t.Logf("Cleanup failed: %v", err)
+			t.Fail()
+		}
 	}()
 
 	baseURL := "http://localhost:8080"
@@ -210,6 +213,7 @@ func TestTodoIntegration(t *testing.T) {
 			// Assert
 			assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 		})
+		// 다양한 에러 케이스 검증 추가...
 	})
 }
 
