@@ -1,7 +1,7 @@
 # test-playground
 
 ## 개요
-Go + Gin으로 구현한 Todo API와 Testcontainers + LocalStack을 활용한 통합테스트 예제 프로젝트입니다.
+Go + Gin으로 구현한 Todo API와 Testcontainers + LocalStack을 활용한 **백엔드 통합 테스트** 프로젝트입니다.
 
 ## 시작 배경
 블라디미르 코리코프의 "단위 테스트" 책을 읽으면서 깨달은 것들을 정리하고, 직접 구현해보는 프로젝트입니다.
